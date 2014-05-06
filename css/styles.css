@@ -1,0 +1,12 @@
+body {background-color:F0FFF0; color:#000000}
+a:link {color:#000000}
+a:visited {color:#404040}
+a:active {color:#707070}
+a:hover {color:#909090}
+p {text-align:justify}
+li {text-align:justify}
+
+.img360 {
+	padding: 10px;
+	border: 0;
+}
