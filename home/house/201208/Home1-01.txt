@@ -1,0 +1,178 @@
+# Home1 script
+# Author Prof1983 <prof1983@ya.ru>
+# Created 14.08.2012
+# LastMod 14.08.2012
+
+import FreeCAD
+import Part
+
+# Created new desk (Example:W=40,H=200,L=1000)
+def NewDesk(Name, PlaceX, PlaceY, PlaceZ, Width, Height, Length, RX, RY, RZ):
+	Obj = App.ActiveDocument.addObject("Part::Box",Name)
+	FreeCADGui.ActiveDocument.getObject(Name).ShapeColor = (1.00,0.67,0.50)
+	Obj.Placement = App.Placement(App.Vector(PlaceX,PlaceY,PlaceZ), App.Rotation(RX, RY, RZ, 1))
+	Obj.Height = Height
+	Obj.Length = Length
+	Obj.Width = Width
+
+# Created new desk (Example:W=40,H=200,L=1000)
+def NewDesk_Center(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk(Name, CenterX-Length/2, CenterY-Width/2, CenterZ-Height/2, Width, Height, Length, 0, 0, 0)
+
+def NewDesk_X(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk(Name, CenterX-Length/2, CenterY-Width/2, CenterZ-Height/2, Width, Height, Length, 0, 0, 0)
+
+def NewDesk_Y(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk(Name, CenterX-Width/2, CenterY-Length/2, CenterZ-Height/2, Length, Height, Width, 0, 0, 0)
+
+# Created new horisontal desk (Example:W=40,H=200,L=1000)
+def NewDeskH_X(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk_Center(Name, CenterX, CenterY, CenterZ, Height, Width, Length)
+
+# Created new horisontal desk (Example:W=40,H=200,L=1000)
+def NewDeskH_Y(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk_Center(Name, CenterX, CenterY, CenterZ, Length, Width, Height)
+
+# Created new vertical desk (Example:W=40,H=200,L=1000)
+def NewDeskV_X(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk_Center(Name, CenterX, CenterY, CenterZ, Width, Length, Height)
+
+# Created new vertical desk (Example:W=40,H=200,L=1000)
+def NewDeskV_Y(Name, CenterX, CenterY, CenterZ, Width, Height, Length):
+	NewDesk_Center(Name, CenterX, CenterY, CenterZ, Height, Length, Width)
+
+def NewDeskPairX(Name, CenterX, CenterY, CenterZ, Width, Height, Length, Delta):
+	DY = Delta/2 + Width/2
+	NewDeskV_X(Name+"0", CenterX, CenterY-DY, CenterZ, Width, Height, Length)
+	NewDeskV_X(Name+"1", CenterX, CenterY+DY, CenterZ, Width, Height, Length)
+
+def NewDeskPairY(Name, CenterX, CenterY, CenterZ, Width, Height, Length, Delta):
+	DX = Delta/2 + Width/2
+	NewDeskV_Y(Name+"0", CenterX-DX, CenterY, CenterZ, Width, Height, Length)
+	NewDeskV_Y(Name+"1", CenterX+DX, CenterY, CenterZ, Width, Height, Length)
+
+def NewPairX(Name, CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, PairLength, PairWidth):
+	NewDeskPairX(Name+"0", CenterX-PairWidth/2+DeskHeight/2, CenterY, CenterZ, DeskWidth, DeskHeight, PairLength, DeskWidth)
+	NewDeskPairX(Name+"1", CenterX+PairWidth/2-DeskHeight/2, CenterY, CenterZ, DeskWidth, DeskHeight, PairLength, DeskWidth)
+	NewDesk_X(Name+"2", CenterX, CenterY, CenterZ-PairLength/3+DeskHeight/2, DeskWidth, DeskHeight, PairWidth)
+	NewDesk_X(Name+"3", CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, PairWidth)
+	NewDesk_X(Name+"4", CenterX, CenterY, CenterZ+PairLength/3-DeskHeight/2, DeskWidth, DeskHeight, PairWidth)
+
+def NewPairY(Name, CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, DeskLength, PairWidth):
+	NewDeskPairY(Name+"0", CenterX, CenterY-PairWidth/2+DeskHeight/2, CenterZ, DeskWidth, DeskHeight, DeskLength, DeskWidth)
+	NewDeskPairY(Name+"1", CenterX, CenterY+PairWidth/2-DeskHeight/2, CenterZ, DeskWidth, DeskHeight, DeskLength, DeskWidth)
+	NewDesk_Y(Name+"2", CenterX, CenterY, CenterZ-DeskLength/3+DeskHeight/2, DeskWidth, DeskHeight, PairWidth)
+	NewDesk_Y(Name+"3", CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, PairWidth)
+	NewDesk_Y(Name+"4", CenterX, CenterY, CenterZ+DeskLength/3-DeskHeight/2, DeskWidth, DeskHeight, PairWidth)
+
+def NewWallX(NameNum, CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, WallWidth, WallLength):
+	NewPairY("Desk"+NameNum+"0", CenterX-2000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"1", CenterX-1000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"2", CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"3", CenterX+1000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"4", CenterX+2000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+
+def NewWallX1(NameNum, CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, WallWidth, WallLength):
+	DX = DeskWidth
+	NewDeskV_Y("Desk"+NameNum+"00", CenterX-2000+DX, CenterY+WallWidth/2-DeskHeight/2, CenterZ, DeskWidth, DeskHeight, WallLength)
+	NewDeskV_Y("Desk"+NameNum+"01", CenterX-2000+DX, CenterY-WallWidth/2+DeskHeight/2, CenterZ, DeskWidth, DeskHeight, WallLength)
+	NewDesk_Y("Desk"+NameNum+"02", CenterX-2000, CenterY, CenterZ-WallLength/3+DeskHeight/2, DeskWidth, DeskHeight, WallWidth)
+	NewDesk_Y("Desk"+NameNum+"03", CenterX-2000, CenterY, CenterZ, DeskWidth, DeskHeight, WallWidth)
+	NewDesk_Y("Desk"+NameNum+"04", CenterX-2000, CenterY, CenterZ+WallLength/3-DeskHeight/2, DeskWidth, DeskHeight, WallWidth)
+	NewPairY("Desk"+NameNum+"1", CenterX-1000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"2", CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairY("Desk"+NameNum+"3", CenterX+1000, CenterY, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewDeskV_Y("Desk"+NameNum+"40", CenterX+2000-DX, CenterY+WallWidth/2-DeskHeight/2, CenterZ, DeskWidth, DeskHeight, WallLength)
+	NewDeskV_Y("Desk"+NameNum+"41", CenterX+2000-DX, CenterY-WallWidth/2+DeskHeight/2, CenterZ, DeskWidth, DeskHeight, WallLength)
+	NewDesk_Y("Desk"+NameNum+"42", CenterX+2000, CenterY, CenterZ-WallLength/3+DeskHeight/2, DeskWidth, DeskHeight, WallWidth)
+	NewDesk_Y("Desk"+NameNum+"43", CenterX+2000, CenterY, CenterZ, DeskWidth, DeskHeight, WallWidth)
+	NewDesk_Y("Desk"+NameNum+"44", CenterX+2000, CenterY, CenterZ+WallLength/3-DeskHeight/2, DeskWidth, DeskHeight, WallWidth)
+
+def NewWallY(NameNum, CenterX, CenterY, CenterZ, DeskWidth, DeskHeight, WallWidth, WallLength):
+	NewPairX("Desk"+NameNum+"0", CenterX, CenterY-2500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairX("Desk"+NameNum+"1", CenterX, CenterY-1500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairX("Desk"+NameNum+"2", CenterX, CenterY-500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairX("Desk"+NameNum+"3", CenterX, CenterY+500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairX("Desk"+NameNum+"4", CenterX, CenterY+1500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+	NewPairX("Desk"+NameNum+"5", CenterX, CenterY+2500, CenterZ, DeskWidth, DeskHeight, WallLength, WallWidth)
+
+# --- Global const ---
+
+HouseLength = 4400+80+40
+HouseWidth = 4600+40
+FloorHeight = 3000
+WallWidth = 600
+
+Sqrt2 = 1.414
+
+# --- Base ---
+
+def CreateBase1(HouseWidth, HouseLenght, WallWidth, Height0):
+	NewDeskH_X("Base0", 0, -HouseLength/2, Height0+20, 40, WallWidth, HouseWidth-WallWidth)
+	NewDeskH_X("Base1", 0, +HouseLength/2, Height0+20, 40, WallWidth, HouseWidth-WallWidth)
+	NewDeskH_Y("Base2", -HouseWidth/2, 0, Height0+20, 40, WallWidth, HouseLength+WallWidth)
+	NewDeskH_Y("Base3", +HouseWidth/2, 0, Height0+20, 40, WallWidth, HouseLength+WallWidth)
+
+def CreateBase():
+	CreateBase1(HouseWidth, HouseLength, WallWidth, 0)
+
+# --- Walls ---
+
+def CreateWalls():
+	NewWallX1("0", 0, -HouseLength/2, 1540, 40, 200, WallWidth, FloorHeight)
+	NewWallX1("1", 0, HouseLength/2, 1540, 40, 200, WallWidth, FloorHeight)
+	NewWallY("2", -HouseWidth/2, 0, 1540, 40, 200, WallWidth, FloorHeight)
+	NewWallY("3", HouseWidth/2, 0, 1540, 40, 200, WallWidth, FloorHeight)
+
+#--- Floor0 ---
+
+def CreateFloor0():
+	NewDesk_X("Desk400", 0, -1500, 200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk401", 0, -500, 200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk402", 0, 500, 200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk403", 0, 1500, 200/2+40, 40, 200, HouseWidth+WallWidth)
+
+#--- Floor1 ---
+
+def CreateFloor1():
+	NewDesk_X("Desk410", 0, -1500, FloorHeight-200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk411", 0, -500, FloorHeight-200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk412", 0, 500, FloorHeight-200/2+40, 40, 200, HouseWidth+WallWidth)
+	NewDesk_X("Desk413", 0, 1500, FloorHeight-200/2+40, 40, 200, HouseWidth+WallWidth)
+
+# --- Roof ---
+
+Deg45 = 0.4142
+Deg135 = 2.414
+
+def CreateRoof():
+	Delta = 200/(2*Sqrt2)
+	L = Sqrt2*(HouseWidth+2000)/2
+	NewDesk("Desk500", -HouseWidth/2-1000+Delta, -2500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+	NewDesk("Desk501", -HouseWidth/2-1000+Delta, -1500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+	NewDesk("Desk502", -HouseWidth/2-1000+Delta, -500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+	NewDesk("Desk503", -HouseWidth/2-1000+Delta, +500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+	NewDesk("Desk504", -HouseWidth/2-1000+Delta, +1500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+	NewDesk("Desk505", -HouseWidth/2-1000+Delta, +2500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg45, 0)
+
+	NewDesk("Desk510", HouseWidth/2+1000+Delta, -2500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+	NewDesk("Desk511", HouseWidth/2+1000+Delta, -1500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+	NewDesk("Desk512", HouseWidth/2+1000+Delta, -500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+	NewDesk("Desk513", HouseWidth/2+1000+Delta, +500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+	NewDesk("Desk514", HouseWidth/2+1000+Delta, +1500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+	NewDesk("Desk515", HouseWidth/2+1000+Delta, +2500, FloorHeight+40-Delta, 40, 200, L, 0, -Deg135, 0)
+
+# --- Main ---
+
+CreateBase()
+CreateWalls()
+CreateFloor0()
+CreateFloor1()
+CreateRoof()
+
+# ----
+
+Gui.activeDocument().activeView().viewAxometric()
+App.ActiveDocument.recompute()
+Gui.SendMsgToActiveView("ViewFit")
+
